@@ -16,10 +16,35 @@
 
 package sg.yikjiun.aurora;
 
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
 /**
  * @author Lee Yik Jiun
  */
 public class Arrays {
+    /**
+     * Shuffles an array using Fisher-Yates shuffle.
+     *
+     * Time: O(n)
+     * Space: O(1)
+     * where n is the number of elements in the array.
+     */
+    public static void fisherYatesShuffle(int[] nums) {
+        Random r = ThreadLocalRandom.current();
+        int n = nums.length;
+        for (int i = 0; i < n - 1; ++i) {
+            int j = r.nextInt(i + 1);
+            swap(nums, i, j);
+        }
+    }
+
+    private static void swap(int[] nums, int i, int j) {
+        int t = nums[i];
+        nums[i] = nums[j];
+        nums[j] = t;
+    }
+
     /**
      * Returns a sorted array using lsd radix sort.
      *
