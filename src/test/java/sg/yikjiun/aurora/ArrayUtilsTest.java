@@ -54,6 +54,19 @@ public class ArrayUtilsTest {
     }
 
     @Test
+    public void testCountingSort() {
+        int n = 100;
+        int[] control = new int[n];
+        for (int i = 0; i < n; ++i) {
+            control[i] = i;
+        }
+        int[] test = Arrays.copyOf(control, n);
+        ArrayUtils.fisherYatesShuffle(test);
+
+        assertArrayEquals(control, ArrayUtils.CountingSort(test));
+    }
+
+    @Test
     public void testNextPermutation() {
         int[] control = {1, 2, 3, 5, 4};
         int[] test = {1, 2, 3, 4, 5};

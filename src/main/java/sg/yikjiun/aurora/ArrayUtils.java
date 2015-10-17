@@ -46,6 +46,54 @@ public class ArrayUtils {
     }
 
     /**
+     * Returns a sorted array using counting sort.
+     * 
+     * Only works if k is an integer (i.e. Range of values not too huge)
+     * Time: O(k + n)
+     * Space: O(k + n)
+     * where n is the number of elements in the array to be sorted
+     *       k is the difference between smallest and largest value
+     */
+    public static int[] CountingSort(int[] nums) {
+        int n = nums.length;
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+
+        // Check range of values by extracting min/max: O(n)
+        for (int i = 0; i < n; ++i) {
+            int num = nums[i];
+            if (num < min) {
+                min = num;
+            }
+            if (num > max) {
+                max = num;
+            }
+        }
+
+        // Count instances of each value: O(n)
+        int k = max - min + 1;
+        int[] countArr = new int[k];
+        for (int i = 0; i < n; ++i) {
+            ++countArr[nums[i] - min];
+        }
+
+        // Accumulate indices in countArr: O(k)
+        for (int i = 1; i < k; ++i) {
+            countArr[i] += countArr[i-1];
+        }
+
+        // Puts values back into nums: O(n)
+        int[] sortedNums = new int[n];
+        for (int i = 0; i < n; ++i) {
+            int num = nums[i];
+            int numIndex = countArr[num - min] - 1;
+            sortedNums[numIndex] = num;
+            --countArr[num - min];
+        }
+        return sortedNums;
+    }
+
+    /**
      * Returns a sorted array using lsd radix sort.
      *
      * Only works on non-negative integers.
