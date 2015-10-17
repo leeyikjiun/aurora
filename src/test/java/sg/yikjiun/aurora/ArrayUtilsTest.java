@@ -54,6 +54,15 @@ public class ArrayUtilsTest {
     }
 
     @Test
+    public void testNextPermutation() {
+        int[] control = {1, 2, 3, 5, 4};
+        int[] test = {1, 2, 3, 4, 5};
+        ArrayUtils.nextPermutation(test);
+
+        assertArrayEquals(control, test);
+    }
+
+    @Test
     public void testReverse() {
         int n = 10;
         int[] control = new int[n];
@@ -63,6 +72,49 @@ public class ArrayUtilsTest {
             test[i] = n - i - 1;
         }
         ArrayUtils.reverse(test);
+
+        assertArrayEquals(control, test);
+    }
+
+    @Test
+    public void testReverseWithBegin() {
+        int n = 10;
+        int halfN = n / 2;
+        int[] control = new int[n];
+        int[] test = new int[n];
+        for (int i = 0; i < halfN; ++i) {
+            control[i] = i;
+            test[i] = i;
+        }
+        for (int i = halfN; i < n; ++i) {
+            control[i] = i;
+            test[i] = n - (i - halfN) - 1;
+        }
+        ArrayUtils.reverse(test, halfN);
+
+        assertArrayEquals(control, test);
+    }
+
+    @Test
+    public void testReverseWithBeginEnd() {
+        int n = 10;
+        int halfN = n / 2;
+        int quarterN = halfN / 2;
+        int[] control = new int[n];
+        int[] test = new int[n];
+        for (int i = 0; i < quarterN; ++i) {
+            control[i] = i;
+            test[i] = i;
+        }
+        for (int i = quarterN; i < halfN; ++i) {
+            control[i] = i;
+            test[i] = halfN - (i - quarterN) - 1;
+        }
+        for (int i = halfN; i < n; ++i) {
+            control[i] = i;
+            test[i] = i;
+        }
+        ArrayUtils.reverse(test, quarterN, halfN);
 
         assertArrayEquals(control, test);
     }

@@ -77,6 +77,27 @@ public class ArrayUtils {
         return nums;
     }
 
+    public static void nextPermutation(int[] nums) {
+        int n = nums.length;
+        int i;
+        for (i = n - 2; i >= 0; --i) {
+            if (nums[i] < nums[i + 1]) {
+                break;
+            }
+        }
+        if (i < 0) {
+            return;
+        }
+        int j;
+        for (j = n - 1; j > i; --j) {
+            if (nums[i] < nums[j]) {
+                break;
+            }
+        }
+        swap(nums, i, j);
+        reverse(nums, i + 1);
+    }
+
     /**
      * Reverses an array
      *
@@ -85,8 +106,33 @@ public class ArrayUtils {
      * where n is the number of elements in the array.
      */
     public static void reverse(int[] nums) {
-        int i = 0;
-        int j = nums.length - 1;
+        reverse(nums, 0);
+    }
+
+    /**
+     * Reverses an array.
+     *
+     * Time: O(n)
+     * Space: O(1)
+     * where n is the number of elements in the array.
+     * @param beginIndex the begin index, inclusive.
+     */
+    public static void reverse(int[] nums, int beginIndex) {
+        reverse(nums, beginIndex, nums.length);
+    }
+
+    /**
+     * Reverses an array.
+     *
+     * Time: O(n)
+     * Space: O(1)
+     * where n is the number of elements in the array.
+     * @param beginIndex the begin index, inclusive.
+     * @param endIndex the end index, exclusive.
+     */
+    public static void reverse(int[] nums, int beginIndex, int endIndex) {
+        int i = beginIndex;
+        int j = endIndex - 1;
 
         while (i < j) {
             swap(nums, i++, j--);
