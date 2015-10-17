@@ -16,8 +16,11 @@
 
 package sg.yikjiun.aurora;
 
+import java.util.Collections;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.CheckReturnValue;
 
 /**
  * @author Lee Yik Jiun
@@ -54,41 +57,30 @@ public class ArrayUtils {
      * where n is the number of elements in the array to be sorted
      *       k is the difference between smallest and largest value
      */
-    public static int[] CountingSort(int[] nums) {
+    @CheckReturnValue
+    public static int[] countingSort(int[] nums) {
         int n = nums.length;
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
 
         // Check range of values by extracting min/max: O(n)
-        for (int i = 0; i < n; ++i) {
-            int num = nums[i];
-            if (num < min) {
-                min = num;
-            }
-            if (num > max) {
-                max = num;
-            }
+        for (int num : nums) {
+            min = Math.min(min, num);
+            max = Math.max(max, num);
         }
 
         // Count instances of each value: O(n)
         int k = max - min + 1;
         int[] countArr = new int[k];
-        for (int i = 0; i < n; ++i) {
-            ++countArr[nums[i] - min];
+        for (int num : nums) {
+            ++countArr[num - min];
         }
 
-        // Accumulate indices in countArr: O(k)
-        for (int i = 1; i < k; ++i) {
-            countArr[i] += countArr[i-1];
-        }
-
-        // Puts values back into nums: O(n)
         int[] sortedNums = new int[n];
-        for (int i = 0; i < n; ++i) {
-            int num = nums[i];
-            int numIndex = countArr[num - min] - 1;
-            sortedNums[numIndex] = num;
-            --countArr[num - min];
+        for (int i = 0, j = 0; i < k; ++i) {
+            while (countArr[i]-- > 0) {
+                sortedNums[j++] = i + min;
+            }
         }
         return sortedNums;
     }
@@ -101,7 +93,8 @@ public class ArrayUtils {
      * Space: O(n)
      * where n is the number of elements in the array to be sorted
      */
-    public static int[] LsdRadixSort(int[] nums) {
+    @CheckReturnValue
+    public static int[] lsdRadixSort(int[] nums) {
         int n = nums.length;
         for (int i = 0, j = 1; i < 31; ++i, j <<= 1) {
             int[] tmpNums = new int[n];

@@ -50,7 +50,7 @@ public class ArrayUtilsTest {
         int[] test = Arrays.copyOf(control, n);
         ArrayUtils.fisherYatesShuffle(test);
 
-        assertArrayEquals(control, ArrayUtils.LsdRadixSort(test));
+        assertArrayEquals(control, ArrayUtils.lsdRadixSort(test));
     }
 
     @Test
@@ -63,7 +63,7 @@ public class ArrayUtilsTest {
         int[] test = Arrays.copyOf(control, n);
         ArrayUtils.fisherYatesShuffle(test);
 
-        assertArrayEquals(control, ArrayUtils.CountingSort(test));
+        assertArrayEquals(control, ArrayUtils.countingSort(test));
     }
 
     @Test
