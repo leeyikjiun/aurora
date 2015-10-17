@@ -22,7 +22,7 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * @author Lee Yik Jiun
  */
-public class Arrays {
+public class ArrayUtils {
     /**
      * Shuffles an array using Fisher-Yates shuffle.
      *
@@ -75,5 +75,21 @@ public class Arrays {
             nums = tmpNums;
         }
         return nums;
+    }
+
+    /**
+     * Reverses an array
+     *
+     * Time: O(n)
+     * Space: O(1)
+     * where n is the number of elements in the array.
+     */
+    public static void reverse(int[] nums) {
+        int i = 0;
+        int j = nums.length - 1;
+
+        while (i < j) {
+            swap(nums, i++, j--);
+        }
     }
 }

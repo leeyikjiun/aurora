@@ -18,13 +18,15 @@ package sg.yikjiun.aurora;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 
 /**
  * @author Lee Yik Jiun
  */
-public class ArraysTest {
+public class ArrayUtilsTest {
     @Test
     public void testFisherYatesShuffle() {
         int n = 10;
@@ -32,10 +34,10 @@ public class ArraysTest {
         for (int i = 0; i < n; ++i) {
             control[i] = i;
         }
-        int[] test = java.util.Arrays.copyOf(control, n);
+        int[] test = Arrays.copyOf(control, n);
 
-        Arrays.fisherYatesShuffle(test);
-        assertFalse(java.util.Arrays.equals(control, test));
+        ArrayUtils.fisherYatesShuffle(test);
+        assertFalse(Arrays.equals(control, test));
     }
 
     @Test
@@ -45,9 +47,23 @@ public class ArraysTest {
         for (int i = 0; i < n; ++i) {
             control[i] = i;
         }
-        int[] test = java.util.Arrays.copyOf(control, n);
-        Arrays.fisherYatesShuffle(test);
+        int[] test = Arrays.copyOf(control, n);
+        ArrayUtils.fisherYatesShuffle(test);
 
-        assertArrayEquals(control, Arrays.LsdRadixSort(test));
+        assertArrayEquals(control, ArrayUtils.LsdRadixSort(test));
+    }
+
+    @Test
+    public void testReverse() {
+        int n = 10;
+        int[] control = new int[n];
+        int[] test = new int[n];
+        for (int i = 0; i < n; ++i) {
+            control[i] = i;
+            test[i] = n - i - 1;
+        }
+        ArrayUtils.reverse(test);
+
+        assertArrayEquals(control, test);
     }
 }
