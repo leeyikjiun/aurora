@@ -18,6 +18,7 @@ package sg.yikjiun.aurora;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import sg.yikjiun.aurora.SplayTreeSet.Node;
 
 import static org.junit.Assert.assertEquals;

@@ -39,7 +39,13 @@ public class SplayTreeSetTest {
         set = new SplayTreeSet<>();
 
         integers = new ArrayList<>();
-        for (int i = 0; i < 10; ++i) {
+        for (int i = Integer.MIN_VALUE; i < Integer.MIN_VALUE + 100; ++i) {
+            integers.add(i);
+        }
+        for (int i = -100; i <= 100; ++i) {
+            integers.add(i);
+        }
+        for (int i = Integer.MAX_VALUE; i > Integer.MAX_VALUE - 100; --i) {
             integers.add(i);
         }
         Collections.shuffle(integers);

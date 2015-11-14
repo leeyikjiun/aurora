@@ -135,14 +135,14 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
                 root = null;
             }
         } else {
-            if (node.left != null) {
-                parent.linkLeft(node.left);
-            } else if (node.right != null) {
-                parent.linkRight(node.right);
-            } else if (node.isLeftChild()) {
-                parent.left = null;
+            Node child = node.left;
+            if (child == null) {
+                child = node.right;
+            }
+            if (node.isLeftChild()) {
+                parent.linkLeft(child);
             } else {
-                parent.right = null;
+                parent.linkRight(child);
             }
             splay(parent);
         }
@@ -228,8 +228,8 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
     static class Node<E extends Comparable<E>> {
         E e;
         @Nullable Node<E> parent;
-        Node<E> left;
-        Node<E> right;
+        @Nullable Node<E> left;
+        @Nullable Node<E> right;
 
         public Node(E e) {
             this.e = e;
@@ -316,6 +316,7 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         void linkLeft(Node<E> child) {
             left = child;
             if (child != null) {
+                assert left.e.compareTo(e) < 0;
                 child.parent = this;
             }
         }
@@ -323,6 +324,7 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         void linkRight(Node<E> child) {
             right = child;
             if (child != null) {
+                assert e.compareTo(right.e) < 0;
                 child.parent = this;
             }
         }
