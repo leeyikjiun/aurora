@@ -16,18 +16,19 @@
 
 package sg.yikjiun.aurora;
 
-import javax.annotation.CheckReturnValue;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+
+import javax.annotation.CheckReturnValue;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author Lee Yik Jiun
  */
 public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
-    Node root = null;
+    Node<E> root = null;
     private int size = 0;
 
     @Override
@@ -63,7 +64,7 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
 
     @Override
     public boolean add(E e) {
-        Node node = insert(new Node(e));
+        Node<E> node = insert(new Node<E>(e));
         if (node == null) {
             return false;
         }
@@ -75,12 +76,12 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
 
     @CheckReturnValue
     @Nullable
-    private Node insert(@Nonnull Node newNode) {
+    private Node<E> insert(@Nonnull Node<E> newNode) {
         if (root == null) {
             root = newNode;
         } else {
-            Node parent = null;
-            Node node = root;
+            Node<E> parent = null;
+            Node<E> node = root;
             boolean isLeft = true;
             while (node != null) {
                 parent = node;
@@ -107,7 +108,7 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
     @Override
     public boolean remove(Object o) {
         E e = (E) o;
-        Node node = find(e);
+        Node<E> node = find(e);
         if (node == null) {
             return false;
         }
@@ -115,31 +116,44 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         return remove(node);
     }
 
-    private boolean remove(Node node) {
-        System.out.println("node: " + node.e);
+    private boolean remove(Node<E> node) {
         if (node.left != null && node.right != null) {
-            Node predecessor = node.getPredecessor();
+            Node<E> predecessor = node.getPredecessor();
+            assert predecessor != null;
             node.e = predecessor.e;
             return remove(predecessor);
         }
-        Node parent = node.parent;
-        if (node.left != null) {
-            parent.linkLeft(node.left);
-        } else if (node.right != null) {
-            parent.linkRight(node.right);
-        } else if (node.isLeftChild()) {
-            parent.left = null;
+
+        // 0 or 1 child
+        Node<E> parent = node.parent;
+        if (parent == null) {
+            if (node.left != null) {
+                root = node.left;
+            } else if (node.right != null) {
+                root = node.right;
+            } else {
+                root = null;
+            }
         } else {
-            parent.right = null;
+            if (node.left != null) {
+                parent.linkLeft(node.left);
+            } else if (node.right != null) {
+                parent.linkRight(node.right);
+            } else if (node.isLeftChild()) {
+                parent.left = null;
+            } else {
+                parent.right = null;
+            }
+            splay(parent);
         }
-        splay(parent);
         return true;
     }
 
-    private void splay(Node node) {
-        Node parent = node.parent;
+    private void splay(Node<E> node) {
+        Node<E> parent = node.parent;
         while (parent != null) {
-            Node grandparent = parent.parent;
+            assert node.isValid();
+            Node<E> grandparent = parent.parent;
             if (grandparent == null) {
                 if (node.isLeftChild()) {
                     node.zig();
@@ -165,8 +179,8 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
     }
 
     @Nullable
-    private Node find(E e) {
-        Node node = root;
+    private Node<E> find(E e) {
+        Node<E> node = root;
         while (node != null) {
             int cmp = node.e.compareTo(e);
             if (cmp < 0) {
@@ -182,7 +196,12 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        for (Object o : c) {
+            if (!contains(o)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -208,41 +227,54 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
 
     static class Node<E extends Comparable<E>> {
         E e;
-        Node parent;
-        Node left;
-        Node right;
+        @Nullable Node<E> parent;
+        Node<E> left;
+        Node<E> right;
 
         public Node(E e) {
             this.e = e;
         }
 
         void zig() {
+            assert parent != null;
             assert this.isLeftChild();
-            Node grandparent = parent.parent;
+            Node<E> grandparent = parent.parent;
+            boolean wasLeft = grandparent == null || parent.isLeftChild();
             parent.linkLeft(right);
             linkRight(parent);
 
             if (grandparent == null) {
                 parent = null;
             } else {
-                grandparent.linkRight(this);
+                if (wasLeft) {
+                    grandparent.linkLeft(this);
+                } else {
+                    grandparent.linkRight(this);
+                }
             }
         }
 
         void zag() {
+            assert parent != null;
             assert this.isRightChild();
-            Node grandparent = parent.parent;
+            Node<E> grandparent = parent.parent;
+            boolean wasLeft = grandparent == null || parent.isLeftChild();
             parent.linkRight(left);
             linkLeft(parent);
 
             if (grandparent == null) {
                 parent = null;
             } else {
-                grandparent.linkLeft(this);
+                if (wasLeft) {
+                    grandparent.linkLeft(this);
+                } else {
+                    grandparent.linkRight(this);
+                }
             }
         }
 
         void zigZig() {
+            assert parent != null;
             assert this.isLeftChild();
             assert parent.isLeftChild();
 
@@ -251,6 +283,7 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         }
 
         void zagZag() {
+            assert parent != null;
             assert this.isRightChild();
             assert parent.isRightChild();
 
@@ -259,7 +292,8 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         }
 
         void zigZag() {
-            Node grandparent = parent.parent;
+            assert parent != null;
+            Node<E> grandparent = parent.parent;
             assert grandparent != null;
             assert parent.isLeftChild();
             assert this.isRightChild();
@@ -269,7 +303,8 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         }
 
         void zagZig() {
-            Node grandparent = parent.parent;
+            assert parent != null;
+            Node<E> grandparent = parent.parent;
             assert grandparent != null;
             assert parent.isRightChild();
             assert this.isLeftChild();
@@ -278,14 +313,14 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
             zag();
         }
 
-        void linkLeft(Node child) {
+        void linkLeft(Node<E> child) {
             left = child;
             if (child != null) {
                 child.parent = this;
             }
         }
 
-        void linkRight(Node child) {
+        void linkRight(Node<E> child) {
             right = child;
             if (child != null) {
                 child.parent = this;
@@ -293,9 +328,9 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         }
 
         @Nullable
-        Node getPredecessor() {
-            Node prevNode = null;
-            Node node = left;
+        Node<E> getPredecessor() {
+            Node<E> prevNode = null;
+            Node<E> node = left;
             while (node != null) {
                 prevNode = node;
                 node = node.right;
@@ -304,9 +339,9 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
         }
 
         @Nullable
-        Node getSuccessor() {
-            Node prevNode = null;
-            Node node = right;
+        Node<E> getSuccessor() {
+            Node<E> prevNode = null;
+            Node<E> node = right;
             while (node != null) {
                 prevNode = node;
                 node = node.left;
@@ -318,7 +353,7 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
             return this.equals(parent.left);
         }
 
-        public boolean isLeftChild(Node parent) {
+        public boolean isLeftChild(Node<E> parent) {
             return this.parent.equals(parent) && this.equals(parent.left);
         }
 
@@ -326,8 +361,15 @@ public class SplayTreeSet<E extends Comparable<E>> implements Set<E> {
             return !isLeftChild();
         }
 
-        public boolean isRightChild(Node parent) {
+        public boolean isRightChild(Node<E> parent) {
             return this.parent.equals(parent) && this.equals(parent.right);
+        }
+
+        boolean isValid() {
+            return
+                (parent == null || (isLeftChild() && e.compareTo(parent.e) < 0) || (isRightChild() && parent.e.compareTo(e) < 0))
+                    && (left == null || left.e.compareTo(e) < 0)
+                    && (right == null || e.compareTo(right.e) < 0);
         }
     }
 }
