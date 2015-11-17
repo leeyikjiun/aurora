@@ -16,209 +16,47 @@
 
 package sg.yikjiun.aurora;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
-
 /**
  * @author Lee Yik Jiun
  */
-public class IntVanEmdeBoasTreeSetV1 implements Set<Integer> {
-    private long M = 1L << 32;
-    private int sqrtM = 1 << 16;
-    private int size = 0;
-    private int max = -1;
-    private long min = M;
-    private IntVanEmdeBoasTreeSetV1 auxiliary;
-    private IntVanEmdeBoasTreeSetV1[] children;
+public class IntVanEmdeBoasTreeSetV1 extends BaseIntVanEmdeBoasTreeSet {
+    private final int sqrtM;
 
-    public IntVanEmdeBoasTreeSetV1() {
-        this(1L << 32);
-    }
-
-    public IntVanEmdeBoasTreeSetV1(long M) {
-        this.M = M;
+    public IntVanEmdeBoasTreeSetV1(int M) {
         sqrtM = (int) Math.sqrt(M);
     }
 
-    @Override
-    public int size() {
-        return size;
+    public IntVanEmdeBoasTreeSetV1() {
+        sqrtM = 1 << 16;
     }
 
     @Override
-    public boolean isEmpty() {
-        return size == 0;
+    protected int getLowerOrderBits(int integer) {
+        return integer % sqrtM;
     }
 
     @Override
-    public boolean contains(Object o) {
-        int integer = (int) o;
-        if (min > max) {
-            return false;
-        }
-
-        if (integer == min || integer == max) {
-            return true;
-        }
-
-        if (auxiliary == null || auxiliary.isEmpty()) {
-            return false;
-        }
-
-        if (children == null) {
-            return false;
-        }
-
-        int i = (int) Math.floor(integer / sqrtM);
-        IntVanEmdeBoasTreeSetV1 child = children[i];
-        return child != null && child.contains(integer % sqrtM);
+    protected int getHigherOrderBits(int integer) {
+        return (int) Math.floor(integer / sqrtM);
     }
 
     @Override
-    public Iterator<Integer> iterator() {
-        return null;
+    protected BaseIntVanEmdeBoasTreeSet newIntVanEmdeBoasTreeSet() {
+        return new IntVanEmdeBoasTreeSetV1(sqrtM);
     }
 
     @Override
-    public Object[] toArray() {
-        return new Object[0];
+    protected BaseIntVanEmdeBoasTreeSet[] newChildren() {
+        return new IntVanEmdeBoasTreeSetV1[sqrtM];
+    }
+
+    @Override
+    protected int getBits(int i, int integer) {
+        return i * sqrtM + integer;
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
         return null;
-    }
-
-    @Override
-    public boolean add(Integer integer) {
-        // empty
-        if (min > max) {
-            min = max = integer;
-            ++size;
-            return true;
-        }
-
-        if (min == max) {
-            if (min == integer && integer == max) {
-                return false;
-            }
-
-            if (integer < min) {
-                min = integer;
-            } else if (integer > max) {
-                max = integer;
-            }
-            ++size;
-            return true;
-        }
-
-        if (integer < min) {
-            int tmp = integer;
-            integer = (int) min;
-            min = tmp;
-        } else if (integer > max) {
-            int tmp = integer;
-            integer = max;
-            max = tmp;
-        }
-        int i = (int) Math.floor(integer / sqrtM);
-        if (children == null) {
-            children = new IntVanEmdeBoasTreeSetV1[sqrtM];
-        }
-        if (children[i] == null) {
-            children[i] = new IntVanEmdeBoasTreeSetV1(sqrtM);
-        }
-        IntVanEmdeBoasTreeSetV1 child = children[i];
-        child.add(integer % sqrtM);
-        if (child.min == child.max) {
-            if (auxiliary == null) {
-                auxiliary = new IntVanEmdeBoasTreeSetV1(sqrtM);
-            }
-            auxiliary.add(i);
-        }
-        ++size;
-        return true;
-    }
-
-    @Override
-    public boolean remove(Object o) {
-        int integer = (int) o;
-        if (min > max || integer < min || integer > max) {
-            return false;
-        }
-
-        if (min == integer && integer == max) {
-            min = M;
-            max = -1;
-            --size;
-            assert isEmpty();
-            return true;
-        }
-
-        int i;
-        if (integer == min) {
-            if (auxiliary == null || auxiliary.isEmpty()) {
-                min = max;
-                --size;
-                return true;
-            } else {
-                // need to include high order bits
-                i = (int) auxiliary.min;
-                integer = (int) (children[i].min);
-                min = i * sqrtM + integer;
-            }
-        } else if (integer == max) {
-            if (auxiliary == null || auxiliary.isEmpty()) {
-                max = (int) min;
-                --size;
-                return true;
-            } else {
-                i = auxiliary.max;
-                integer = children[i].max;
-                max = i * sqrtM + integer;
-            }
-        } else if (auxiliary == null || auxiliary.isEmpty()) {
-            return false;
-        } else {
-            i = integer / sqrtM;
-            integer %= sqrtM;
-        }
-        IntVanEmdeBoasTreeSetV1 child = children[i];
-        if (child == null) {
-            return false;
-        }
-
-        child.remove(integer);
-        if (child.isEmpty()) {
-            auxiliary.remove(i);
-        }
-        --size;
-        return true;
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Integer> c) {
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        return false;
-    }
-
-    @Override
-    public void clear() {
-
     }
 }
