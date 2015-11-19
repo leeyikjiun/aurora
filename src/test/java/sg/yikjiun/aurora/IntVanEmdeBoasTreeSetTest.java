@@ -8,9 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Lee Yik Jiun
@@ -21,7 +19,7 @@ public class IntVanEmdeBoasTreeSetTest {
 
     @Before
     public void setUp() throws Exception {
-        set = new IntVanEmdeBoasTreeSetV2();
+        set = new IntVanEmdeBoasTreeSetV3();
 
         integers = new ArrayList<>();
         for (int i = 0; i <= 100; ++i) {
@@ -40,7 +38,7 @@ public class IntVanEmdeBoasTreeSetTest {
         int size = 0;
         for (Integer integer : integers) {
             assertFalse(set.contains(integer));
-            set.add(integer);
+            assertTrue(set.add(integer));
             assertTrue(set.contains(integer));
             assertFalse(set.isEmpty());
             assertEquals(++size, set.size());
